@@ -5,7 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONPATH=/app/packages/eval-core:/app/services/api:/app/services/worker
 
 WORKDIR /app
-RUN pip install --no-cache-dir uv==0.11.28
+RUN python -m pip install --no-cache-dir --upgrade pip==26.1.2 uv==0.11.28
 COPY pyproject.toml uv.lock* ./
 RUN uv sync --no-dev
 COPY packages ./packages
