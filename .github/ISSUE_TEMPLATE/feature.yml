@@ -1,0 +1,16 @@
+name: Feature proposal
+description: Propose a metric, adapter, workflow, or reliability improvement
+title: "[proposal] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: decision
+    attributes: { label: Decision this enables, description: What decision becomes safer or easier? }
+    validations: { required: true }
+  - type: textarea
+    id: evidence
+    attributes: { label: Measurement contract, description: Define applicability, raw evidence, uncertainty, and failure modes. }
+    validations: { required: true }
+  - type: textarea
+    id: compatibility
+    attributes: { label: Protocol and security impact }

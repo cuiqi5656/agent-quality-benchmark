@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentquality.dev/schemas/aqb.metric.v1.schema.json",
+  "title": "AQB Metric Observation v1",
+  "type": "object",
+  "required": ["protocol_version", "metric_key", "category", "status", "raw_value", "normalized_score", "evaluator", "evidence"],
+  "properties": {
+    "protocol_version": { "const": "aqb.metric.v1" },
+    "metric_key": { "type": "string" },
+    "category": { "enum": ["outcome", "adherence", "tools", "context", "reliability", "safety", "efficiency", "fairness", "evaluator_quality"] },
+    "definition": { "type": "string" },
+    "status": { "enum": ["measured", "not_applicable", "insufficient_evidence", "error"] },
+    "raw_value": {},
+    "unit": { "type": ["string", "null"] },
+    "normalized_score": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "interval": {
+      "type": ["object", "null"],
+      "properties": { "low": { "type": "number" }, "high": { "type": "number" }, "level": { "type": "number" } },
+      "required": ["low", "high", "level"],
+      "additionalProperties": false
+    },
+    "evaluator": {
+      "type": "object",
+      "required": ["kind", "name", "version"],
+      "properties": {
+        "kind": { "enum": ["deterministic", "declarative", "model", "human"] },
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "model": { "type": ["string", "null"] },
+        "prompt_version": { "type": ["string", "null"] },
+        "calibrated": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "evidence": { "type": "array", "items": { "type": "object" } },
+    "critical": { "type": "boolean", "default": false },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

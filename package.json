@@ -1,0 +1,16 @@
+{
+  "name": "agent-quality-benchmark",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.9.0",
+  "scripts": {
+    "dev": "pnpm --filter @aqb/web dev",
+    "build": "pnpm --filter @aqb/web build",
+    "lint": "pnpm --filter @aqb/web lint",
+    "test": "pnpm --filter @aqb/web test",
+    "test:e2e": "pnpm --filter @aqb/web test:e2e",
+    "api": "PYTHONPATH=packages/eval-core:services/api:services/worker uv run uvicorn aqb_api.main:app --reload --host 127.0.0.1 --port 8000",
+    "test:python": "PYTHONPATH=packages/eval-core:services/api:services/worker uv run pytest",
+    "check": "pnpm lint && pnpm test && pnpm test:python && pnpm build"
+  }
+}

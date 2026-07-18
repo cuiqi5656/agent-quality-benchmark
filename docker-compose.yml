@@ -1,0 +1,87 @@
+name: agent-quality-benchmark
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: aqb
+      POSTGRES_USER: aqb
+      POSTGRES_PASSWORD: aqb-local-only
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aqb -d aqb"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - aqb-postgres:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    environment:
+      AQB_DATABASE_URL: postgresql+psycopg://aqb:aqb-local-only@postgres:5432/aqb
+      AQB_REDIS_URL: redis://redis:6379/0
+      AQB_EXECUTION_MODE: celery
+      AQB_STORAGE_PATH: /data/artifacts
+      AQB_AGENT_ENDPOINT_ALLOWLIST: host.docker.internal,localhost,127.0.0.1
+      AQB_CORS_ORIGINS: http://127.0.0.1:3000,http://localhost:3000
+      AQB_ENCRYPTION_KEY: ${AQB_ENCRYPTION_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      OPENAI_JUDGE_MODEL: ${OPENAI_JUDGE_MODEL:-gpt-5.6-terra}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - aqb-artifacts:/data/artifacts
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  worker:
+    build:
+      context: .
+      dockerfile: services/worker/Dockerfile
+    environment:
+      AQB_DATABASE_URL: postgresql+psycopg://aqb:aqb-local-only@postgres:5432/aqb
+      AQB_REDIS_URL: redis://redis:6379/0
+      AQB_STORAGE_PATH: /data/artifacts
+      AQB_ENCRYPTION_KEY: ${AQB_ENCRYPTION_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - aqb-artifacts:/data/artifacts
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      AQB_API_INTERNAL_URL: http://api:8000
+      NEXT_PUBLIC_AQB_API_PATH: /api/aqb
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+
+volumes:
+  aqb-postgres:
+  aqb-artifacts:

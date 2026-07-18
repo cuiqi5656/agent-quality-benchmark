@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If Agent Quality Benchmark supports your work, cite this software."
+title: "Agent Quality Benchmark"
+type: software
+version: 0.1.0
+date-released: 2026-07-18
+license: MIT
+authors:
+  - family-names: Cui
+    given-names: Qi
+repository-code: "https://github.com/cuiqi5656/agent-quality-benchmark"
+url: "https://github.com/cuiqi5656/agent-quality-benchmark"
+keywords:
+  - AI agents
+  - evaluation
+  - benchmarks
+  - context engineering
+  - agent safety

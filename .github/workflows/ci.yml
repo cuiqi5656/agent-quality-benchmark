@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
+        with:
+          version: "0.11.28"
+          enable-cache: true
+      - run: uv sync --locked --dev
+      - run: uv run ruff check packages services tests
+      - run: uv run mypy packages/eval-core/aqb_eval services/api/aqb_api services/worker/aqb_worker
+      - run: uv run pytest --cov=aqb_eval --cov=aqb_api --cov-report=term-missing --cov-fail-under=70
+      - run: uv run pip-audit
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 11.9.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @aqb/web lint
+      - run: pnpm --filter @aqb/web exec tsc --noEmit
+      - run: pnpm --filter @aqb/web test
+      - run: pnpm --filter @aqb/web build
+      - run: pnpm audit --prod --audit-level high
+
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 11.9.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @aqb/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @aqb/web test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report
+
+  migrations:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: aqb_test
+          POSTGRES_USER: aqb
+          POSTGRES_PASSWORD: aqb_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U aqb -d aqb_test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      AQB_DATABASE_URL: postgresql+psycopg://aqb:aqb_test@127.0.0.1:5432/aqb_test
+      PYTHONPATH: packages/eval-core:services/api:services/worker
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
+        with:
+          version: "0.11.28"
+      - run: uv sync --locked --dev
+      - run: uv run alembic upgrade head
+      - run: uv run alembic downgrade base
+      - run: uv run alembic upgrade head

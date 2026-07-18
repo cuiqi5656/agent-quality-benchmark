@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentquality.dev/schemas/aqb.trace.v1.schema.json",
+  "title": "AQB Trace Bundle v1",
+  "type": "object",
+  "required": ["protocol_version", "manifest", "trials"],
+  "properties": {
+    "protocol_version": { "const": "aqb.trace.v1" },
+    "manifest": {
+      "type": "object",
+      "required": ["run_id", "agent", "suite", "created_at"],
+      "properties": {
+        "run_id": { "type": "string" },
+        "agent": { "type": "object" },
+        "suite": { "type": "object" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "runner_version": { "type": "string" },
+        "configuration_hash": { "type": "string" },
+        "source": { "enum": ["live", "upload", "demo", "otel"] }
+      },
+      "additionalProperties": true
+    },
+    "trials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["trial_id", "case_id", "status", "output", "events", "usage"],
+        "properties": {
+          "trial_id": { "type": "string" },
+          "case_id": { "type": "string" },
+          "variant_id": { "type": ["string", "null"] },
+          "repetition": { "type": "integer", "minimum": 1 },
+          "status": { "enum": ["succeeded", "failed", "refused", "timed_out", "errored"] },
+          "output": { "type": "string" },
+          "final_state": { "type": "object" },
+          "events": { "type": "array", "items": { "type": "object" } },
+          "usage": { "type": "object" },
+          "metrics": { "type": "array", "items": { "$ref": "aqb.metric.v1.schema.json" } },
+          "raw_source": {}
+        },
+        "additionalProperties": true
+      }
+    },
+    "artifacts": { "type": "array", "items": { "type": "object" } },
+    "human_labels": { "type": "array", "items": { "type": "object" } }
+  },
+  "additionalProperties": false
+}

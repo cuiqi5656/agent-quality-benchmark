@@ -1,0 +1,8 @@
+packages:
+  - apps/*
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
+confirmModulesPurge: false
+overrides:
+  "postcss@<8.5.10": "8.5.19"
