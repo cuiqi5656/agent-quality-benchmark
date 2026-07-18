@@ -74,7 +74,7 @@ Deterministic evaluation is the default. An optional provider adapter can add ru
 
 ## Status
 
-AQB v0.1.0 is a release candidate until the published CI and container gates are green. The bundled synthetic pack demonstrates the framework; private, domain-specific suites are recommended for decision-grade evaluation and contamination resistance.
+AQB v0.1.0 has passed its local and hosted CI, CodeQL, full Docker Compose, accessibility, dependency-audit, and high/critical container-security gates. The bundled synthetic pack demonstrates the framework; private, domain-specific suites are recommended for decision-grade evaluation and contamination resistance.
 
 ## License
 

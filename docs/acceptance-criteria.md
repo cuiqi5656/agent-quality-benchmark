@@ -2,9 +2,10 @@
 
 ## Repository and publication
 
-- [ ] Public MIT repository at `cuiqi5656/agent-quality-benchmark`, default branch `main`.
+- [x] Public MIT repository at `cuiqi5656/agent-quality-benchmark`, default branch `main`.
 - [x] README, architecture/methodology/protocol docs, contributing, conduct, security, support, changelog, citation, templates, and Dependabot are present.
-- [ ] Required checks are green on GitHub and v0.1.0 is released only after every required gate passes.
+- [x] Required CI, CodeQL, Docker integration, dependency-audit, and container-scan checks are green on GitHub.
+- [ ] v0.1.0 is released only after the final report commit passes and `main` protection is active.
 
 ## Product and evaluation
 
@@ -29,9 +30,9 @@
 - [x] Uploaded code is never executed; archive traversal, symlink, unsupported type, size, expansion, and compression-ratio attacks are tested.
 - [x] Endpoint scheme, DNS stability, private/special-use targets, embedded credentials, and redirects are controlled.
 - [x] Credential storage requires encryption; redaction, escaped trace content, prompt isolation, and permanent run/artifact deletion are present.
-- [ ] `docker compose up --build` and container health are verified in the release environment.
+- [x] `docker compose up --build --wait`, container health, UI, and proxied API health are verified in the hosted release environment.
 - [x] Python and production npm audits report no known vulnerabilities.
-- [ ] No unresolved high/critical container findings remain.
+- [x] No unresolved high/critical container findings remain.
 
 ## Validation
 
@@ -39,7 +40,11 @@
 - [x] Python lint and strict type checks pass.
 - [x] Frontend lint, TypeScript, unit tests, production build, and Playwright product flows pass.
 - [x] Migration upgrade/downgrade/upgrade passes against an isolated database.
-- [ ] Full Docker integration passes.
-- [ ] GitHub Actions, CodeQL, dependency audit, and Trivy pass remotely.
+- [x] Full Docker integration passes.
+- [x] GitHub Actions, CodeQL, dependency audit, and Trivy pass remotely.
 
-Unchecked items are release blockers, not implied successes.
+## Explicitly deferred post-release setup
+
+- [ ] Select and calibrate an optional semantic-judge provider/key using `docs/final-setup-todo.md`. The owner explicitly deferred this provider choice; deterministic benchmarks and explicit unavailable-judge behavior remain release-ready.
+
+The release checkbox is the only remaining v0.1.0 publication gate. The provider/key checkbox is an owner-deferred post-release integration task, not an implied success or release blocker.

@@ -15,5 +15,10 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.
 - FastAPI/PostgreSQL/Redis/Celery deployment, immutable manifests, SSE progress, encrypted credential references, safe artifact storage, and deletion.
 - Protocol schemas, migration, Docker Compose, tests, pinned CI, CodeQL, dependency audit, and container scanning.
 
+### Fixed
+
+- Hardened Python and Node runtime images to eliminate all open high/critical container findings.
+- Packaged migration configuration and compiled the Docker web proxy against internal API service discovery so the full Compose stack passes health and smoke checks.
+
 [Unreleased]: https://github.com/cuiqi5656/agent-quality-benchmark/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/cuiqi5656/agent-quality-benchmark/releases/tag/v0.1.0
