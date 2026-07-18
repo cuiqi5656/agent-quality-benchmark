@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 RUN python -m pip install --no-cache-dir --upgrade pip==26.1.2 uv==0.11.28
-COPY pyproject.toml uv.lock* ./
+COPY pyproject.toml uv.lock* alembic.ini ./
 RUN uv sync --no-dev
 COPY packages ./packages
 COPY services ./services
