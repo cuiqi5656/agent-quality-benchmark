@@ -90,3 +90,17 @@ jobs:
       - run: uv run alembic upgrade head
       - run: uv run alembic downgrade base
       - run: uv run alembic upgrade head
+
+  docker-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - run: docker compose up --build --wait --wait-timeout 240
+      - run: curl --fail --silent --show-error http://127.0.0.1:3000/
+      - run: curl --fail --silent --show-error http://127.0.0.1:3000/api/aqb/v1/health
+      - if: always()
+        run: |
+          docker compose ps
+          docker compose logs --no-color
+      - if: always()
+        run: docker compose down --volumes --remove-orphans
