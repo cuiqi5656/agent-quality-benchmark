@@ -8,6 +8,8 @@ COPY apps/web/package.json apps/web/package.json
 RUN pnpm install --frozen-lockfile
 
 FROM base AS build
+ARG AQB_API_INTERNAL_URL=http://api:8000
+ENV AQB_API_INTERNAL_URL=${AQB_API_INTERNAL_URL}
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY . .
